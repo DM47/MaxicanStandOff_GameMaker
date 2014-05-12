@@ -25,13 +25,55 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>owner = 0;
-hp = 5;
-active = false;
-owned = false;
-killbill = ds_list_create();
+            <string>owner = 0;                      // player who selected this tile
+hp = 5;                         // starting hitpoints; 5 because it'S one more than hits possible
+active = false;                 // aktive allowes to change image direction
+owned = false;                  // state of already being selected by a player
+killbill = ds_list_create();    // list of all neighboring tiles aiming at this one
 image_speed = 0;
 </string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="2" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>601</id>
+        <kind>0</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>1</exetype>
+        <functionname>action_execute_script</functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>9</kind>
+            <script>scr_endRound</script>
+          </argument>
+          <argument>
+            <kind>0</kind>
+            <string></string>
+          </argument>
+          <argument>
+            <kind>0</kind>
+            <string></string>
+          </argument>
+          <argument>
+            <kind>0</kind>
+            <string></string>
+          </argument>
+          <argument>
+            <kind>0</kind>
+            <string></string>
+          </argument>
+          <argument>
+            <kind>0</kind>
+            <string></string>
           </argument>
         </arguments>
       </action>
@@ -78,9 +120,7 @@ image_speed = 0;
     }
     if (victim.owner != owner) {
         ds_list_add(victim.killbill, owner);
-        with (victim) {
-            if (hp &lt;= ds_list_size(killbill)) {instance_destroy();}
-        }
+        scr_killCheck(victim);
     }    
     active = false;
     with (obj_displayPlayer) {
@@ -109,7 +149,10 @@ image_speed = 0;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if (owned == false) {
+            <string>/* As a player I can select a free tile, mark it as mine activate it for aim direction select */
+
+// check if tile is free
+if (owned == false) {
     if (player == 1) {
         sprite_index = spr_player1;
         owner = 1;
@@ -118,18 +161,26 @@ image_speed = 0;
         sprite_index = spr_player2;
             owner = 2;
     }
+    owned = true;
+    image_index = 0;    // sprite's first image displaying the player'S color but no aiming direction
+    
+    // when other tiles already aim at this one ignore all of those owned by the same player
     if (!ds_list_empty(killbill)) {
         for (i = 0; i &lt; ds_list_size(killbill); i++) {
             if (ds_list_find_value(killbill,i) == owner) {ds_list_delete(killbill, i);}
         }
     }
+    // set hp to the actual amound and do a healtcheck with the updated list
     hp = 3;
-    image_index = 0;
-    owned = true;
+    scr_killCheck(self);
+    
+    // game is still on so activate the tile for direction selection
     active = true;
-    if (hp &lt;= ds_list_size(killbill)) {instance_destroy();}
 }
+
+/* As a player I can select a tile already owned by my instead a new one and correct its aiming direction */
 else if (owner == player) {
+    // when victim's owner is diefferent to current player go through the victim's list and delete any one entry of the current player, reducing damamge
     if (victim.owner != owner &amp;&amp; !ds_list_empty(victim.killbill)) {
         for (i = 0; i &lt; ds_list_size(victim.killbill); i++) {
             if (ds_list_find_value(victim.killbill,i) == owner) {
@@ -138,7 +189,9 @@ else if (owner == player) {
             }
         }
     }
-    image_index = 0;
+    image_index = 0; // sprite's first image displaying the player'S color but no aiming direction
+    
+    // enable tile for direction selection
     active = true;
 }
 </string>

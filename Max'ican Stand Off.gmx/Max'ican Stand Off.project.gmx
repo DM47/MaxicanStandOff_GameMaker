@@ -10,18 +10,27 @@
     <sprite>sprites\spr_player1</sprite>
     <sprite>sprites\spr_player2</sprite>
     <sprite>sprites\spr_displayPlayer</sprite>
+    <sprite>sprites\spr_restartButton</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
   <scripts name="scripts">
     <script>scripts\scr_switchPlayer.gml</script>
+    <script>scripts\scr_killCheck.gml</script>
+    <script>scripts\scr_effectPlayerDeath.gml</script>
+    <script>scripts\scr_endRound.gml</script>
   </scripts>
+  <fonts name="fonts">
+    <font>fonts\fnt_victory</font>
+  </fonts>
   <objects name="objects">
     <object>objects\obj_playfield</object>
     <object>objects\obj_displayPlayer</object>
+    <object>objects\obj_restartButton</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rm_playfield</room>
+    <room>rooms\rm_restart</room>
   </rooms>
   <help>
     <rtf>help.rtf</rtf>
