@@ -19,6 +19,8 @@
     <script>scripts\scr_killCheck.gml</script>
     <script>scripts\scr_effectPlayerDeath.gml</script>
     <script>scripts\scr_endRound.gml</script>
+    <script>scripts\scr_raiseWeapon.gml</script>
+    <script>scripts\scr_followCursor.gml</script>
   </scripts>
   <fonts name="fonts">
     <font>fonts\fnt_victory</font>

@@ -78,6 +78,32 @@ image_speed = 0;
         </arguments>
       </action>
     </event>
+    <event eventtype="3" enumb="1">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>if active == true {
+   image_index = 1;
+   image_angle = scr_followCursor();
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
     <event eventtype="6" enumb="56">
       <action>
         <libid>1</libid>
@@ -96,36 +122,16 @@ image_speed = 0;
           <argument>
             <kind>1</kind>
             <string>if (active == true) {
-    image_index = 1;
-    a = point_direction(x, y, mouse_x, mouse_y);
-    // up
-    if (45 &lt;= a &amp;&amp; a &lt; 135) {
-        image_angle = 0;
-        victim = instance_nearest( x, y - sprite_height, obj_playfield);
-    }
-    // left
-    else if (135 &lt;= a &amp;&amp; a &lt; 225) {
-        image_angle =  90;
-        victim = instance_nearest( x - sprite_width, y, obj_playfield);    
-    }
-    // down
-    else if (225 &lt;= a &amp;&amp; a &lt; 315) {
-        image_angle = 180;
-        victim = instance_nearest( x, y + sprite_width, obj_playfield);
-    }
-    // right
-    else {
-        image_angle = 270;
-        victim = instance_nearest( x + sprite_width, y, obj_playfield);
-    }
-    if (victim.owner != owner) {
-        ds_list_add(victim.killbill, owner);
-        scr_killCheck(victim);
-    }    
+    // Image shall aim in the selcted direction
     active = false;
-    with (obj_displayPlayer) {
-        scr_switchPlayer();
+    scr_raiseWeapon(image_angle);
+    // If target is not in the current player's team add to killbill and check for victory
+    if (target.owner != owner) {
+        ds_list_add(target.killbill, owner);
+        scr_killCheck(target);
     }
+    // end turn/ switch player    
+    scr_switchPlayer();
 }
 </string>
           </argument>
@@ -174,23 +180,23 @@ if (owned == false) {
     hp = 3;
     scr_killCheck(self);
     
+    //image_index = 1;
     // game is still on so activate the tile for direction selection
     active = true;
 }
 
 /* As a player I can select a tile already owned by my instead a new one and correct its aiming direction */
 else if (owner == player) {
-    // when victim's owner is diefferent to current player go through the victim's list and delete any one entry of the current player, reducing damamge
-    if (victim.owner != owner &amp;&amp; !ds_list_empty(victim.killbill)) {
-        for (i = 0; i &lt; ds_list_size(victim.killbill); i++) {
-            if (ds_list_find_value(victim.killbill,i) == owner) {
-                ds_list_delete(victim.killbill, i);
+    // when target's owner is diefferent to current player go through the target's list and delete any one entry of the current player, reducing damamge
+    if (target.owner != owner &amp;&amp; !ds_list_empty(target.killbill)) {
+        for (i = 0; i &lt; ds_list_size(target.killbill); i++) {
+            if (ds_list_find_value(target.killbill,i) == owner) {
+                ds_list_delete(target.killbill, i);
                 break;
             }
         }
     }
-    image_index = 0; // sprite's first image displaying the player'S color but no aiming direction
-    
+    //image_index = 1;   
     // enable tile for direction selection
     active = true;
 }
